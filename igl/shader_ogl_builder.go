@@ -1,13 +1,16 @@
 package igl
 
-import "github.com/go-gl/gl/v4.5-core/gl"
+import (
+	"github.com/go-gl/gl/v4.5-core/gl"
+	"github.com/pkg/errors"
+)
 
 type BuilderOGLShader struct {
 	FlagmentSoucrce string
 	VertexSoucrce   string
 }
 
-func (s *BuilderOGLShader) Build() (*OGLShader, error) {
+func (s *BuilderOGLShader) Build() (*GLShader, error) {
 	// Create Program
 	var program = gl.CreateProgram()
 	// compile vertex shader
@@ -37,7 +40,7 @@ func (s *BuilderOGLShader) Build() (*OGLShader, error) {
 		return nil, errors.WithMessage(ErrorBuildFail, string(log))
 	}
 	//
-	return &OGLShader{
+	return &GLShader{
 		program: program,
 	}, nil
 }

@@ -1,12 +1,10 @@
 package main
 
 import (
-	"sync/atomic"
 	"fmt"
+	"github.com/iamGreedy/Inspire/igl"
 )
 
 func main() {
-	var a uint32 = 4
-	fmt.Println(atomic.CompareAndSwapUint32(&a, 4, 0))
-	fmt.Println(a)
+	fmt.Println(igl.Version())
 }
