@@ -13,12 +13,28 @@ type StreamTexture struct {
 	inited bool
 }
 
+func NewStreamTexture(w, h int) *StreamTexture {
+	temp := &StreamTexture{}
+	// Create texture
+	gl.CreateTextures(gl.TEXTURE_2D, 1, &temp.tex)
+	gl.CreateBuffers(2, &temp.pbo[0])
+	// Texture parameter
+	gl.TextureParameteri(temp.tex, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+	gl.TextureParameteri(temp.tex, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
+	gl.TextureParameteri(temp.tex, gl.TEXTURE_WRAP_S, gl.CLAMP_READ_COLOR)
+	gl.TextureParameteri(temp.tex, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
+	// buffer
+	gl.NamedBufferData(temp.pbo[0], int32(w * h * 4), gl.PtrOffset(0), gl.STREAM_DRAW)
+	gl.NamedBufferData(temp.pbo[1], int32(w * h * 4), gl.PtrOffset(0), gl.STREAM_DRAW)
+	return temp
+}
+
 func (s *StreamTexture) Write(src image.Image) error {
 	var w, h = s.Size()
 	var bd = src.Bounds()
 	var dst  = bto.IsRootRGBA(src)
 	if bd.Dy() != int(h) || bd.Dx() != int(w) || dst == nil{
-		return InvalidSize
+		return ErrorInvalidSize
 	}
 	//
 	current := s.writepoint
@@ -45,18 +61,3 @@ func (s *StreamTexture) Use(unit uint32) {
 	gl.BindTextureUnit(unit, s.tex)
 }
 
-func NewStreamTexture(w, h int) *StreamTexture {
-	temp := &StreamTexture{}
-	// Create texture
-	gl.CreateTextures(gl.TEXTURE_2D, 1, &temp.tex)
-	gl.CreateBuffers(2, &temp.pbo[0])
-	// Texture parameter
-	gl.TextureParameteri(temp.tex, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
-	gl.TextureParameteri(temp.tex, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
-	gl.TextureParameteri(temp.tex, gl.TEXTURE_WRAP_S, gl.CLAMP_READ_COLOR)
-	gl.TextureParameteri(temp.tex, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
-	// buffer
-	gl.NamedBufferData(temp.pbo[0], int32(w * h * 4), gl.PtrOffset(0), gl.STREAM_DRAW)
-	gl.NamedBufferData(temp.pbo[1], int32(w * h * 4), gl.PtrOffset(0), gl.STREAM_DRAW)
-	return temp
-}

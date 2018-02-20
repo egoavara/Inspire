@@ -5,12 +5,11 @@ import (
 	"github.com/pkg/errors"
 )
 
-type BuilderOGLShader struct {
+type BuilderShader struct {
 	FlagmentSoucrce string
 	VertexSoucrce   string
 }
-
-func (s *BuilderOGLShader) Build() (*GLShader, error) {
+func (s *BuilderShader) Build() (*Shader, error) {
 	// Create Program
 	var program = gl.CreateProgram()
 	// compile vertex shader
@@ -40,13 +39,12 @@ func (s *BuilderOGLShader) Build() (*GLShader, error) {
 		return nil, errors.WithMessage(ErrorBuildFail, string(log))
 	}
 	//
-	return &GLShader{
+	return &Shader{
 		program: program,
 	}, nil
 }
 
 type ShaderSource string
-
 func (s ShaderSource) Compile(shaderType uint32) (shader uint32, err error) {
 	shader = gl.CreateShader(shaderType)
 	defer func() {

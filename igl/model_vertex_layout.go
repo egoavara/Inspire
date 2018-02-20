@@ -26,7 +26,7 @@ func (s VertexData) Type() int {
 		return gl.FLOAT
 	}
 }
-func (s VertexData) TypeSize() int {
+func (s VertexData) TypeByteLength() int {
 	switch s {
 	default:
 		return 0
@@ -38,32 +38,34 @@ func (s VertexData) TypeSize() int {
 		return 4
 	}
 }
-func (s VertexData) Size() int {
+func (s VertexData) TypeCount() int {
 	switch s {
 	default:
 		return 0
 	case POSITION:
 		return 3
 	case NORMAL:
-		return gl.FLOAT
+		return 3
 	case TEXTURE:
-		return gl.FLOAT
+		return 2
 	}
 }
-
+func (s VertexData) TotalSize() int {
+	return s.TypeByteLength() * s.TypeCount()
+}
 
 type VertexLayout []VertexData
 func (s VertexLayout) Stride() int {
 	res := 0
 	for _, v:= range s {
-		res += v.Size() * v.TypeSize()
+		res += v.TypeCount() * v.TypeByteLength()
 	}
 	return res
 }
 func (s VertexLayout) Offset(start int) int {
 	res := 0
 	for i := 0; i < start; i ++{
-		res += s[i].Size() * s[i].TypeSize()
+		res += s[i].TypeCount() * s[i].TypeByteLength()
 	}
 	return res
 }
