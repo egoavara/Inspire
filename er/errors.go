@@ -1,4 +1,4 @@
-package igl
+package er
 
 import "github.com/pkg/errors"
 
@@ -7,10 +7,6 @@ var (
 	ErrorCompileFail = errors.New("Comtilation Fail")
 	ErrorBuildFail   = errors.New("Building Fail")
 	ErrorInvalidSize = errors.New("Invalid TypeCount")
-	ErrorInit = errors.New("Application Init Error")
+	ErrorInitialization = errors.New("Initialization Fail")
 )
 
-// Critical only use for panic()
-var (
-	CriticalProgramDeallocate = errors.New("Program deallocate")
-)

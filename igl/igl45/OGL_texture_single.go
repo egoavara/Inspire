@@ -1,7 +1,7 @@
-package igl
+package igl45
 
 import (
-	"github.com/go-gl/gl/v4.5-core/gl"
+	"github.com/go-gl/gl/all-core/gl"
 	"github.com/iamGreedy/Inspire/bto"
 	"image"
 	"image/draw"
