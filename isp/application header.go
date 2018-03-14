@@ -31,11 +31,11 @@ func (s ApplicationHeader) Commit() (err error) {
 	// TODO : Top
 
 	// Border
-	s.app.wnd.SetBordered(s.Borderless)
+	s.app.wnd.SetBordered(!s.Borderless)
 
-	// Swap Interval
-	sdl.GLMakeCurrent(s.app.wnd, s.app.ctx)
-	sdl.GLSetSwapInterval(s.SwapInterval)
+	// TODO : Swap Interval
+	//sdl.GLMakeCurrent(s.app.wnd, s.app.ctx)
+	//sdl.GLSetSwapInterval(0)
 
 	// FullScreen
 	if s.Fullscreen {

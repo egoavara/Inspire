@@ -1,6 +1,6 @@
-package igl45
+package igl46
 
-import "github.com/go-gl/gl/all-core/gl"
+import "github.com/go-gl/gl/v4.6-core/gl"
 
 //
 type VertexData uint8

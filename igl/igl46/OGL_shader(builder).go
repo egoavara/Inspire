@@ -1,8 +1,9 @@
-package igl45
+package igl46
 
 import (
-	"github.com/go-gl/gl/all-core/gl"
+	"github.com/go-gl/gl/v4.6-core/gl"
 	"github.com/pkg/errors"
+	"github.com/iamGreedy/Inspire/er"
 )
 
 type BuilderShader struct {
@@ -36,7 +37,7 @@ func (s *BuilderShader) Build() (*Shader, error) {
 		gl.GetProgramiv(program, gl.INFO_LOG_LENGTH, &logLength)
 		log := make([]byte, logLength+1)
 		gl.GetProgramInfoLog(program, logLength, nil, (*uint8)(&log[0]))
-		return nil, errors.WithMessage(ErrorBuildFail, string(log))
+		return nil, errors.WithMessage(er.ErrorBuildFail, string(log))
 	}
 	//
 	return &Shader{
@@ -66,7 +67,7 @@ func (s ShaderSource) Compile(shaderType uint32) (shader uint32, err error) {
 		var log []byte
 		log = make([]byte, logLength+1)
 		gl.GetShaderInfoLog(shader, logLength, nil, (*uint8)(gl.Ptr(&log[0])))
-		err = errors.WithMessage(ErrorCompileFail, string(log[:len(log)-1]))
+		err = errors.WithMessage(er.ErrorCompileFail, string(log[:len(log)-1]))
 		return
 	}
 	return

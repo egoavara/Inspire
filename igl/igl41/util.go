@@ -1,7 +1,7 @@
-package igl45
+package igl46
 
 import (
-	"github.com/go-gl/gl/all-core/gl"
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"fmt"
 )
 

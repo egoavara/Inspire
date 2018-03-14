@@ -1,10 +1,11 @@
-package igl45
+package igl46
 
 import (
-	"github.com/go-gl/gl/all-core/gl"
+	"github.com/go-gl/gl/v4.1-core/gl"
 	"github.com/iamGreedy/Inspire/bto"
 	"image"
 	"image/draw"
+	"github.com/iamGreedy/Inspire/er"
 )
 
 type SingleTexture struct {
@@ -36,7 +37,7 @@ func (s *SingleTexture) Read(dst draw.Image) error {
 	var w, h = s.Size()
 	var bd = dst.Bounds()
 	if bd.Dy() != int(h) || bd.Dx() != int(w) {
-		return ErrorInvalidSize
+		return er.ErrorInvalidSize
 	}
 	if v := bto.IsRootRGBA(dst); v != nil {
 		gl.GetTextureImage(s.ptr, 1, gl.RGBA, gl.UNSIGNED_BYTE, int32(len(v.Pix)), gl.Ptr(v.Pix))
@@ -50,7 +51,7 @@ func (s *SingleTexture) Write(src image.Image) error {
 	var w, h = s.Size()
 	var bd = src.Bounds()
 	if bd.Dy() != int(h) || bd.Dx() != int(w) {
-		return ErrorInvalidSize
+		return er.ErrorInvalidSize
 	}
 	pix := bto.Image(src)
 	gl.TextureSubImage2D(s.ptr, 1, 0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, gl.Ptr(pix))

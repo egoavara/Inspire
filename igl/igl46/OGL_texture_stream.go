@@ -1,9 +1,10 @@
-package igl45
+package igl46
 
 import (
-	"github.com/go-gl/gl/all-core/gl"
+	"github.com/go-gl/gl/v4.6-core/gl"
 	"github.com/iamGreedy/Inspire/bto"
 	"image"
+	"github.com/iamGreedy/Inspire/er"
 )
 
 type StreamTexture struct {
@@ -24,17 +25,19 @@ func NewStreamTexture(w, h int) *StreamTexture {
 	gl.TextureParameteri(temp.tex, gl.TEXTURE_WRAP_S, gl.CLAMP_READ_COLOR)
 	gl.TextureParameteri(temp.tex, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
 	// buffer
-	gl.NamedBufferData(temp.pbo[0], int32(w * h * 4), gl.PtrOffset(0), gl.STREAM_DRAW)
-	gl.NamedBufferData(temp.pbo[1], int32(w * h * 4), gl.PtrOffset(0), gl.STREAM_DRAW)
+	gl.NamedBufferData(temp.pbo[0], w * h * 4, gl.PtrOffset(0), gl.STREAM_DRAW)
+	gl.NamedBufferData(temp.pbo[1], w * h * 4, gl.PtrOffset(0), gl.STREAM_DRAW)
 	return temp
 }
-
+func (s *StreamTexture) Skip() {
+	s.writepoint = (s.writepoint + 1) % 2
+}
 func (s *StreamTexture) Write(src image.Image) error {
 	var w, h = s.Size()
 	var bd = src.Bounds()
 	var dst  = bto.IsRootRGBA(src)
 	if bd.Dy() != int(h) || bd.Dx() != int(w) || dst == nil{
-		return ErrorInvalidSize
+		return er.ErrorInvalidSize
 	}
 	//
 	current := s.writepoint
@@ -46,10 +49,10 @@ func (s *StreamTexture) Write(src image.Image) error {
 	gl.BindBuffer(gl.PIXEL_UNPACK_BUFFER, s.pbo[current])
 	defer gl.BindBuffer(gl.PIXEL_UNPACK_BUFFER, 0)
 	if !s.inited{
-		gl.NamedBufferData(s.pbo[current], int32(len(dst.Pix)), gl.Ptr(dst.Pix), gl.STREAM_DRAW)
+		gl.NamedBufferData(s.pbo[current], len(dst.Pix), gl.Ptr(dst.Pix), gl.STREAM_DRAW)
 	}
 	gl.TextureSubImage2D(s.tex, 1, 0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, gl.PtrOffset(0))
-	gl.NamedBufferData(s.pbo[next], int32(len(dst.Pix)), gl.Ptr(dst.Pix), gl.STREAM_DRAW)
+	gl.NamedBufferData(s.pbo[next], len(dst.Pix), gl.Ptr(dst.Pix), gl.STREAM_DRAW)
 	return nil
 }
 func (s *StreamTexture) Size() (w, h int32) {

@@ -8,5 +8,6 @@ var (
 	ErrorBuildFail   = errors.New("Building Fail")
 	ErrorInvalidSize = errors.New("Invalid TypeCount")
 	ErrorInitialization = errors.New("Initialization Fail")
+	ErrorUnsatisfied = errors.New("Unsatisfied")
 )
 

@@ -8,4 +8,5 @@ import (
 func init() {
 	utl.Must(sdl.Init(sdl.INIT_EVERYTHING ^ sdl.WasInit(sdl.INIT_EVERYTHING)))
 	initDisplays()
+	//initSDLEventHandler()
 }

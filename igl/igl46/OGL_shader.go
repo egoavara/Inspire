@@ -1,9 +1,10 @@
-package igl45
+package igl46
 
 import (
-	"github.com/go-gl/gl/all-core/gl"
+	"github.com/go-gl/gl/v4.6-core/gl"
 	"sync/atomic"
 	"sync"
+	"github.com/iamGreedy/Inspire/er"
 )
 
 type Shader struct {
@@ -15,14 +16,14 @@ type Shader struct {
 func (s *Shader) Use() {
 	s.mtx.RLock()
 	if s.program == 0{
-		panic(CriticalProgramDeallocate)
+		panic(er.CriticalProgramDeallocate)
 	}
 	gl.UseProgram(s.program)
 }
 func (s *Shader) Release() {
 	s.mtx.RUnlock()
 	if s.program == 0{
-		panic(CriticalProgramDeallocate)
+		panic(er.CriticalProgramDeallocate)
 	}
 	gl.UseProgram(0)
 }
@@ -30,7 +31,7 @@ func (s *Shader) Close() {
 	s.mtx.Lock()
 	defer s.mtx.Unlock()
 	if s.program == 0{
-		panic(CriticalProgramDeallocate)
+		panic(er.CriticalProgramDeallocate)
 	}
 	temp := s.program
 	atomic.StoreUint32(&s.program, 0)
