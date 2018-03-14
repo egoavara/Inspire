@@ -1,7 +1,7 @@
 package isp
 
 type Worker interface {
-	Work(app *Application) error
+	Work(app *Application, dt int64) error
 }
 
 type Working func(app *Application) error

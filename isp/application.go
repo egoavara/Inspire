@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"github.com/iamGreedy/Inspire/utl"
 	"sync/atomic"
+	"time"
 )
 
 type Application struct {
@@ -52,15 +53,24 @@ func (s *Application) Init() (err error) {
 func (s *Application) Swap() {
 	sdl.GLSwapWindow(s.wnd)
 }
-func (s *Application) Run() error{
+func (s *Application) Run() (err error){
 	atomic.StoreInt32(&s.runflag, 1)
 	defer atomic.StoreInt32(&s.runflag, 0)
-	for true{
-		err := s.Work.Work(s)
+	s.Ticker.Start()
+	defer s.Ticker.Stop()
+
+	var prev, curr time.Time
+	prev = s.Ticker.Wait()
+	for curr = s.Ticker.Wait();err == nil;curr = s.Ticker.Wait(){
+		dt := int64(prev.Sub(curr)/time.Millisecond)
+		err := s.Work.Work(s, dt)
 		if err != nil {
-			return err
+			break
 		}
+
+		// endup
 		s.Swap()
+		prev = curr
 	}
 	return nil
 }
