@@ -1,4 +1,4 @@
-package app
+package isp
 
 import "github.com/veandco/go-sdl2/sdl"
 
@@ -51,4 +51,14 @@ func SDLPixelToString(format uint32) string {
 }
 func SDLPixelFromString(format string) uint32 {
 	return pixelformats[format]
+}
+
+func SDLPixelList(format string) []string {
+	var temp = make([]string, len(pixelformats))
+	var i = 0
+	for k := range pixelformats{
+		temp[i] = k
+
+	}
+	return temp
 }

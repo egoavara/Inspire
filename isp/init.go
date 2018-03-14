@@ -1,4 +1,4 @@
-package app
+package isp
 
 import (
 	"github.com/iamGreedy/Inspire/utl"
