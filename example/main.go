@@ -23,7 +23,6 @@ func main() {
 	utl.Must(app.Init())
 	app.Work = &isp.Working{
 		FnBefore: func(dt int64) error {
-			fmt.Println(dt)
 			return nil
 		},
 		FnHandle: func(event sdl.Event) error {
@@ -42,5 +41,6 @@ func main() {
 			return nil
 		},
 	}
-	fmt.Println(app.Run())
+
+	isp.Main()
 }

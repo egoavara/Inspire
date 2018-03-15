@@ -7,6 +7,10 @@ import (
 
 type Context struct {}
 
+func (s Context) VersionString() (string) {
+	return gl.GoStr(gl.GetString(gl.VERSION))
+}
+
 func (s Context) Version() (major, minor int) {
 	var ma, mi int32
 	gl.GetIntegerv(gl.MAJOR_VERSION, &ma)

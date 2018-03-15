@@ -1,6 +1,7 @@
 package isp
 
 import (
+	"fmt"
 	"github.com/iamGreedy/Inspire/er"
 	"github.com/iamGreedy/Inspire/igl"
 	"github.com/iamGreedy/Inspire/utl"
@@ -8,17 +9,14 @@ import (
 	"github.com/veandco/go-sdl2/sdl"
 	"runtime"
 	"sync/atomic"
-	"time"
-	"fmt"
 )
 
 type Application struct {
 	Header ApplicationHeader
 	Work   Worker
 	//
-	runflag int32
-	wnd     *sdl.Window
-	ctx     sdl.GLContext
+	wnd *sdl.Window
+	ctx sdl.GLContext
 }
 
 func createApplication(work Worker, header *ApplicationHeader) *Application {
@@ -39,8 +37,8 @@ func finalizeApplication(s *Application) {
 // SDL, GL functions
 func (s *Application) Init() (err error) {
 	defer func() {
-		if err != nil{
-			if s.wnd != nil{
+		if err != nil {
+			if s.wnd != nil {
 				s.wnd.Destroy()
 			}
 		}
@@ -59,7 +57,7 @@ func (s *Application) Init() (err error) {
 	igl.Init()
 	ctx := igl.LoadContext()
 	major, minor := ctx.Version()
-	fmt.Println(major, minor)
+	fmt.Println(ctx.VersionString())
 	//
 	if err = sdl.GLSetAttribute(sdl.GL_CONTEXT_MAJOR_VERSION, major); err != nil {
 		return err
@@ -80,96 +78,62 @@ func (s *Application) Init() (err error) {
 		return err
 	}
 
-	return s.Header.Commit()
+	return nil
 }
 func (s *Application) Swap() {
 	sdl.GLSwapWindow(s.wnd)
 }
-func (s *Application) Run() (err error) {
-	if s.Work == nil {
-		return errors.WithMessage(er.ErrorUnsatisfied, "s.Work == nil")
-	}
-	// runflag Set
-	atomic.StoreInt32(&s.runflag, 1)
-	// ticket setup
-	var ticker Ticker
-	if s.Header.SwapInterval == 0 {
-		ticker = NewTicker(0)
-	} else {
-		ticker = NewTicker(time.Second / time.Duration(s.Header.SwapInterval))
-	}
-	ticker.Start()
-	defer ticker.Stop()
-	// Event
-	//fmt.Println(utl.MustValue(s.wnd.GetID()).(uint32))
-	//id := utl.MustValue(s.wnd.GetID()).(uint32)
-	//evch := installHandler(id)
-	//defer uninstallHandler(id)
-	// context
-	var ctx = igl.LoadContext()
-	// timer values
-	var prev, curr time.Time
-	prev = ticker.Wait()
-	// Main loop
-MainLoop:
-	for curr = ticker.Wait(); !atomic.CompareAndSwapInt32(&s.runflag, 0, 0); curr = ticker.Wait() {
-		// Before
-		err = s.Work.Before(int64(curr.Sub(prev) / time.Millisecond))
-		if err != nil {
-			err = s.Work.Recover(err)
-			if err == nil {
-				continue MainLoop
-			}
-			break MainLoop
+func (s *Application) Run() error {
+	for event := sdl.PollEvent(); event != nil; event = sdl.PollEvent() {
+		switch e := event.(type) {
+		case *sdl.QuitEvent:
+			atomic.StoreInt32(&running, 0)
+		default:
 		}
-		// While
-		err = s.Work.While(s, ctx)
-		if err != nil {
-			err = s.Work.Recover(err)
-			if err == nil {
-				continue MainLoop
-			}
-			break MainLoop
-		}
-		// Swapping
-		s.Swap()
-		// Event handle
-		//ChannelLoop:
-		//for {
-		//	select {
-		//	case e := <-evch:
-		//		err = s.Work.Handle(e)
-		//		if err != nil {
-		//			err = s.Work.Recover(err)
-		//			if err == nil {
-		//				continue MainLoop
-		//			}
-		//			break MainLoop
-		//		}
-		//	//default:
-		//	//	break ChannelLoop
-		//	}
-		//}
-		// After
-		err = s.Work.After(s)
-		if err != nil {
-			err = s.Work.Recover(err)
-			if err == nil {
-				continue MainLoop
-			}
-			break MainLoop
-		}
-		// endup
-		prev = curr
 	}
-	return err
-}
-func (s *Application) Stop() {
-	atomic.StoreInt32(&s.runflag, 0)
-}
+	var err error
+	// Before
+	err = s.Work.Before(dt)
+	if err != nil {
+		err = s.Work.Recover(err)
+		if err == nil {
+			return true
+		}
+		return false
+	}
+	// While
+	err = s.Work.While(s, ctx)
+	if err != nil {
+		err = s.Work.Recover(err)
+		if err == nil {
+			return true
+		}
+		return false
+	}
+	// Swapping
+	s.Swap()
+	// Event handle
 
-func (s *Application) IsRun() bool {
-	return atomic.CompareAndSwapInt32(&s.runflag, 1, 1)
+	for _, e := range evs {
+		err = s.Work.Handle(e)
+		if err != nil {
+			err = s.Work.Recover(err)
+			if err == nil {
+				return true
+			}
+			return false
+		}
+	}
+	// After
+	err = s.Work.After(s)
+	if err != nil {
+		err = s.Work.Recover(err)
+		if err == nil {
+			return true
+		}
+		return false
+	}
+	return true
 }
 
 // Window functions

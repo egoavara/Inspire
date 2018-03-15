@@ -7,7 +7,6 @@ type ApplicationHeader struct {
 	Display       *display
 	Mode          displayMode
 	Name          string
-	SwapInterval  int
 	Borderless    bool
 	Top           bool
 	Fullscreen    bool
@@ -32,10 +31,6 @@ func (s ApplicationHeader) Commit() (err error) {
 
 	// Border
 	s.app.wnd.SetBordered(!s.Borderless)
-
-	// TODO : Swap Interval
-	//sdl.GLMakeCurrent(s.app.wnd, s.app.ctx)
-	//sdl.GLSetSwapInterval(0)
 
 	// FullScreen
 	if s.Fullscreen {
